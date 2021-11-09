@@ -107,7 +107,7 @@ typedef enum{
 void errorReport(void* parser, ErrorType ErrorType, const char* fnt,...);
 void symbolTableClear(VM*,SymbolTable* buffer);
 #define IO_ERROR(...)\
-    errorReport(NUll, ERROR_IO, __VA_ARGS__)
+    errorReport(NULL, ERROR_IO, __VA_ARGS__)
 #define MEM_ERROR(...)\
     errorReport(NULL, ERROR_MEM, __VA_ARGS__)
 #define LEX_ERROR(parser,...)\
