@@ -74,7 +74,7 @@ typedef struct
         {\
             buf->datas[buf->count++] = data;\
             cnt ++;\
-        }\       
+        }\
     }\
     void type##BufferAdd(VM* vm, type##Buffer* buf, type data)\
     {\
@@ -107,15 +107,15 @@ typedef enum{
 void errorReport(void* parser, ErrorType ErrorType, const char* fnt,...);
 void symbolTableClear(VM*,SymbolTable* buffer);
 #define IO_ERROR(...)\
-    errorReport(NUll, ERROR_IO, __VA_ARGE__)
+    errorReport(NUll, ERROR_IO, __VA_ARGS__)
 #define MEM_ERROR(...)\
-    errorReport(NULL, ERROR_MEM, __VA_ARGE__)
+    errorReport(NULL, ERROR_MEM, __VA_ARGS__)
 #define LEX_ERROR(parser,...)\
-    errorReport(parser,ERROR_LEX, __VA_ARGE__)
+    errorReport(parser,ERROR_LEX, __VA_ARGS__)
 #define COMPILE_ERROR(parser,...)\
-    errorReport(parser,ERROR_COMPILE, __VA_ARGE__)
+    errorReport(parser,ERROR_COMPILE, __VA_ARGS__)
 #define RUN_ERROR(...)\
-    errorReport(NULL,ERROR_RUNTIME, __VA_ARGE__)
+    errorReport(NULL,ERROR_RUNTIME, __VA_ARGS__)
 
 #define DEFAULT_BUFFER_SIZE 512
 #endif
