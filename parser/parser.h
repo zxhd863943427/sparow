@@ -97,9 +97,10 @@ struct parser
     const char* sourceCode;
     const char* nextCharPtr;
     char curChar;
-    Token curToken;
-    Token preToken;
-    int inter;
+    Token curToken;             //目前token
+    Token preToken;             //前一个token
+    int interpolationExpectRightParenNum;   //期望的右边括号数量
+    VM* vm;
 } ;
 
 

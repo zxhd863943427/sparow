@@ -106,15 +106,53 @@ static void parseId(Parser* parser, TokenType type)
     }
     parser->curToken.length=length;
 }
-//解码unicode码点
+//解码unicode码点，已检测到‘\uXXXX’的'u'
 static void parseUnicodeCodePoint(Parser* parser,ByteBuffer* buf)
 {
     uint32_t idx = 0;
     int value = 0;
     uint8_t digit = 0;
-    while(idx<4)
+    char temp;                      //缓存重内存中读取的parser->curChar
+    for (uint32_t idx=0; idx < 4; idx++)
     {
-        idx++;      //跳过第一个字符'u'
+        getNextChar(parser);        //跳过第一个字符‘u’
+        temp = parser->curChar;
+        if (temp == '\0')
+        {
+            LEX_ERROR(parser,"unterminted code!不正确的unicode转码输入！");
+        }
+        if (temp >= '0' && temp <= '9')
+        {
+            digit = temp -'0';
+        }
+        else if (temp >= 'a' && temp <= 'f')
+        {
+            digit = temp -'f' + 10;
+        }
+        else if (temp >= 'A' && temp <= 'F')
+        {
+            digit = temp - 'F' + 10;
+        }
+        else 
+        {
+            LEX_ERROR(parser,"invalid unicode! 输入的unicode码不在编码范围内！");
+        }
+        value = (value<<4) | digit;         //先右移四位，再填充
+    }
+    uint32_t byteNum = getByteNumOfEncodeUtf8(value);
+    ASSERT(byteNum != 0, "utf8 encode byte must between 1 - 4!");
+    ByteBufferFillWrite(parser->vm, buf, 0, byteNum);               //先对目标地址填0,保证存在足够空间
+    encodeUtf8(buf->datas + buf->count - byteNum, value);           //buf->datas指向bytebuffer缓冲区的首位，加上buf->conut得到了储存目前位置，，在减去之前提前申请的部分，就得到了写入的地址
+}
+//解析字符串,开始于目前的parser->curChar='\"'
+static void parseString(Parser* parser)
+{
+    ByteBuffer str;
+    ByteBufferInit(&str);
+    while (true)
+    {
+        getNextChar(parser);
         
     }
+    
 }

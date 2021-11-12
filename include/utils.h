@@ -61,6 +61,7 @@ typedef struct
     void type##BufferFillWrite(VM* vm,type##Buffer* buf, type data, uint32_t fillCount)\
     {\
         uint32_t newCounts = buf->count+fillCount;\
+        /*检查剩余空间是否充足，否则就自动扩容*/\
         if (newCounts > buf->capacity)\
         {\
             size_t oldSize =buf->capacity * sizeof(type);\
