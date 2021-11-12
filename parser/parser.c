@@ -218,9 +218,34 @@ static void parseString(Parser* parser)
         }
         else
         {
-            ByteBufferAdd(parser->vm, &str, parser->curChar);
+            ByteBufferAdd(parser->vm, &str, parser->curChar);       //将非特殊文本写入缓冲区
         }
     }
-    ByteBufferClear(parser->vm, &str); 
-    
+    ByteBufferClear(parser->vm, &str);                              //释放缓冲区
+}
+
+//跳过一行
+static void skipAline(Parser* parser)
+{
+    getNextChar(parser);
+    while (parser->curChar != '\0')
+    {
+        if (parser->curChar == '\n')
+        {
+            parser-> curToken.lineNo++;
+            getNextChar(parser);
+            break;
+        }
+        getNextChar(parser);
+    }
+}
+
+//跳过行注释和列注释
+static void skipComment(Parser* parser)
+{
+    char nextChar = lookAheadChar(parser);
+    if (parser->curChar == '/')
+    {
+        skipAline(parser);
+    }
 }
