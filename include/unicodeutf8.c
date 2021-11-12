@@ -62,6 +62,22 @@ uint8_t encodeUtf8(uint8_t* buf,int value)
 }
 //返回UTF-8解码出的字节数
 uint32_t getByteNumOfDecodeUtf8(uint8_t byte)
-{   //
-
+{   
+    if ((byte & 0b11000000)==0b10000000)
+    {
+        return 0;                           //如果为后面字节，退出，并返回0
+    }
+    if ((byte & 0b11100000)==0b11000000)
+    {
+        return 2;
+    }
+    if ((byte & 0b11110000)==0b11100000)
+    {
+        return 3;
+    }
+    if ((byte & 0b11111000)==0b11110000)
+    {
+        return 4;
+    }
+    return 1;
 }
