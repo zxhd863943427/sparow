@@ -212,9 +212,15 @@ static void parseString(Parser* parser)
                 ByteBufferAdd(parser->vm,&str, '\\');
                 break;
             default:
+                LEX_ERROR(parser, "unsupport escape \\%c", parser->curChar);
                 break;
             }
         }
+        else
+        {
+            ByteBufferAdd(parser->vm, &str, parser->curChar);
+        }
     }
+    ByteBufferClear(parser->vm, &str); 
     
 }
