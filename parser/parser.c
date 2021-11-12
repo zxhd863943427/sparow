@@ -112,14 +112,14 @@ static void parseUnicodeCodePoint(Parser* parser,ByteBuffer* buf)
     uint32_t idx = 0;
     int value = 0;
     uint8_t digit = 0;
-    char temp;                      //缓存重内存中读取的parser->curChar
+    char temp;                      //缓存从内存中读取的parser->curChar
     for (uint32_t idx=0; idx < 4; idx++)
     {
         getNextChar(parser);        //跳过第一个字符‘u’
         temp = parser->curChar;
         if (temp == '\0')
         {
-            LEX_ERROR(parser,"unterminted code!不正确的unicode转码输入！");
+            LEX_ERROR(parser,"unterminted code!unicode在开始就为0,输入意外终止！");
         }
         if (temp >= '0' && temp <= '9')
         {
@@ -152,7 +152,69 @@ static void parseString(Parser* parser)
     while (true)
     {
         getNextChar(parser);
-        
+        if (parser->curChar == '\0')
+        {
+            LEX_ERROR(parser, "unterminated String! 未遇到另一 \" 就终止，输入不完整！");
+        }
+        if (parser->curChar == '"')
+        {
+            parser->curToken.type = TOKEN_STRING;
+            break;
+        }
+        if (parser->curChar == '%')
+        {
+            if (!matchNextChar(parser,'('))
+            {
+                LEX_ERROR(parser, " \'%%\' should by follow \'(\'! ");
+            }
+            if (parser->interpolationExpectRightParenNum>0)
+            {
+                COMPILE_ERROR(parser,"sorry, now didn`t support more interplate!");
+            }
+            parser ->interpolationExpectRightParenNum =1;
+            parser ->curToken.type = TOKEN_INTERPOLATION;
+            break;
+        }
+
+        if (parser->curChar=='\\')
+        {
+            getNextChar(parser);
+            switch (parser->curChar)
+            {
+            case '0':
+                ByteBufferAdd(parser->vm,&str, '\0');
+                break;
+            case 'a':
+                ByteBufferAdd(parser->vm,&str, '\a');
+                break;
+            case 'b':
+                ByteBufferAdd(parser->vm,&str, '\b');
+                break;
+            case 'f':
+                ByteBufferAdd(parser->vm,&str, '\f');
+                break;
+            case 'n':
+                ByteBufferAdd(parser->vm,&str, '\n');
+                break;
+            case 'r':
+                ByteBufferAdd(parser->vm,&str, '\r');
+                break;
+            case 't':
+                ByteBufferAdd(parser->vm,&str, '\t');
+                break;
+            case 'u':
+                parseUnicodeCodePoint(parser, &str);
+                break;
+            case '"':
+                ByteBufferAdd(parser->vm,&str, '"');
+                break;
+            case '\\':
+                ByteBufferAdd(parser->vm,&str, '\\');
+                break;
+            default:
+                break;
+            }
+        }
     }
     
 }

@@ -80,7 +80,11 @@ uint32_t getByteNumOfDecodeUtf8(uint8_t byte)
     {
         return 4;
     }
-    return 1;
+    if ((byte & 0b10000000)==0b00000000)
+    {
+        return 1;
+    }
+    NOT_REACHED();
 }
 
 //返回解码的unicode码，接受一个字节地址和最大解码长度
