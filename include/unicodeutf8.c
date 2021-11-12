@@ -1,6 +1,7 @@
 #include "unicodeutf8.h"
 #include "common.h"
 
+//返回编码unicode字符所需的字节数
 uint32_t getByteNumOfEncodeUtf8(int value)
 {
     ASSERT(value > 0,"Could not encode value < 0!");
@@ -80,4 +81,51 @@ uint32_t getByteNumOfDecodeUtf8(uint8_t byte)
         return 4;
     }
     return 1;
+}
+
+//返回解码的unicode码，接受一个字节地址和最大解码长度
+int decodeUtf8(const uint8_t *buf, uint32_t length)
+{
+    int value ;
+    uint32_t remainingNum;
+    //判断ascii
+    if ((*buf)&0x80==0)
+    {
+        return *buf;
+    }
+    else if((*buf)&0xe0==0xc0)
+    {
+        value+=((*buf)&0x1f);
+        remainingNum = 1;
+    }
+    else if ((*buf)&0xf0==0xe0)
+    {
+        value+=((*buf)&0x0f);
+        remainingNum = 2;
+    }
+    else if ((*buf)&0xf8==0xf0)
+    {
+        value+=((*buf)&0x07);
+        remainingNum = 3;
+    }
+    else
+    {//字符非法
+        return -1;
+    }
+    //字符被截断
+    if (remainingNum<length-1)
+    {
+        return -1;
+    }
+    while (remainingNum>0)
+    {
+        buf++;
+        remainingNum--;
+        if (((*buf)& 0xc0) != 0x80)
+        {
+            return -1;
+        }
+        value = (value<<6) | ((*buf)&0x3f);
+    }
+    return value;
 }
