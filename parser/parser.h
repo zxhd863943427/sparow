@@ -81,7 +81,7 @@ typedef enum
    //文件结束标记,仅词法分析时使用
    TOKEN_EOF                        //'EOF'
 } TokenType;
-typedef struct 
+typedef struct
 {
     /* Token结构*/
     TokenType type;
@@ -90,7 +90,7 @@ typedef struct
     uint32_t lineNo;
 }Token;
 
-typedef struct
+struct parser
 {
     /* data */
     const char* file;
@@ -100,7 +100,7 @@ typedef struct
     Token curToken;
     Token preToken;
     int inter;
-} parser;
+} ;
 
 
 #endif
