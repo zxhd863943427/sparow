@@ -294,9 +294,22 @@ void getNextToken(Parser * parser)
                 parser->curToken.type = TOKEN_COLON;
                 break;
             case '(':
+                if (parser->interpolationExpectRightParenNum > 0)
+                {
+                    parser->interpolationExpectRightParenNum++;
+                }
                 parser->curToken.type = TOKEN_LEFT_PAREN;
                 break;
             case ')':
+                if (parser->interpolationExpectRightParenNum > 0)
+                {
+                    parser->interpolationExpectRightParenNum--;
+                    if (parser->interpolationExpectRightParenNum == 0)
+                    {
+                        parseString(parser);
+                        break;
+                    }
+                }
                 parser->curToken.type = TOKEN_RIGHT_PAREN;
                 break;
             case '[':
@@ -422,18 +435,24 @@ void getNextToken(Parser * parser)
             default:
             //开始判断变量名和关键字部分
             //暂时不做数字识别
-            if (isalpha(parser->curChar) || parser->curChar == '_')         //判断id和关键词
-            {
-                parseId(parser,TOKEN_UNKNOWN);
-                break;
-            }
-            else if (parser->curChar == '#' && matchNextChar(parser,'!'))
-            {
-                skipAline(parser);
-                continue;
-            }
-            LEX_ERROR(parser, "unsupport alpha %c !", parser->curChar);
+                if (isalpha(parser->curChar) || parser->curChar == '_')         //判断id和关键词
+                {
+                    parseId(parser,TOKEN_UNKNOWN);
+                    return;
+                }
+                else if (parser->curChar == '#' && matchNextChar(parser,'!'))
+                {
+                    skipAline(parser);
+                    parser->curToken.start = parser->nextCharPtr -1;
+                    continue;
+                }
+                else
+                {
+                    LEX_ERROR(parser, "unsupport alpha %c !", parser->curChar);
+                }
         }
-        parser->curToken.length = (parser->nextCharPtr -1) -parser->curToken.start;
+        parser->curToken.length = parser->nextCharPtr  -parser->curToken.start;     //我也不知道为什么这里不用减1了……
+        getNextChar(parser);
+        return;
     }
 }
