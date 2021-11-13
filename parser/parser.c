@@ -281,6 +281,7 @@ void getNextToken(Parser * parser)
     parser->preToken = parser->curToken;
     skipBlanks(parser);                                 //跳过空格
     parser->curToken.type = TOKEN_EOF;                  //设置初始token为eof
+    parser->curToken.length = 0;
     parser->curToken.start = parser->nextCharPtr - 1;   //指向当前处理字符
     while (parser->curChar != '\0')
     {
@@ -340,8 +341,7 @@ void getNextToken(Parser * parser)
                 parser->curToken.type = TOKEN_MUL;
                 break;
             case '/':
-            char temp = lookAheadChar(parser);
-                if (temp == '/' || temp == '*')
+                if (matchNextChar(parser,'/') || matchNextChar(parser,'*'))
                 {
                     skipComment(parser);
                     parser->curToken.start = parser->nextCharPtr -1;        //重置文本开始地址
