@@ -39,7 +39,7 @@ struct keywordToken keywordsToken[]=
 static TokenType idOrkeyword(const char* start, uint32_t length)
 {
     uint32_t idx = 0;
-    while (*(keywordsToken[idx].keyword)!=NULL)
+    while (keywordsToken[idx].keyword!=NULL)
     {
         if (keywordsToken[idx].length == length &&\
             memcmp(keywordsToken[idx].keyword, start, length) == 0)
@@ -75,7 +75,7 @@ static bool matchNextChar(Parser* parser, char expectedChar)
         return false;
     }
 }
-
+//跳过空白字符，如果遇到换行符，则将parser->curToken.lineNo加一
 static void skipBlanks(Parser* parser)
 {
     while (isspace(parser->curChar))
@@ -109,7 +109,7 @@ static void parseId(Parser* parser, TokenType type)
 //解码unicode码点，已检测到‘\uXXXX’的'u'
 static void parseUnicodeCodePoint(Parser* parser,ByteBuffer* buf)
 {
-    uint32_t idx = 0;
+
     int value = 0;
     uint8_t digit = 0;
     char temp;                      //缓存从内存中读取的parser->curChar
@@ -248,4 +248,37 @@ static void skipComment(Parser* parser)
     {
         skipAline(parser);
     }
+    else
+    {
+        while(nextChar != '*' && nextChar != '\0')
+        {
+            getNextChar(parser);
+            if(parser->curChar == '\n')
+            {
+                parser->curToken.lineNo++;
+            }
+            nextChar = lookAheadChar(parser);
+        }
+        if (matchNextChar(parser,'*'))
+        {
+            if (!matchNextChar(parser,'/'))      //匹配到*/
+            {
+                LEX_ERROR(parser,"expect '/' after '*' !");
+            }
+            getNextChar(parser);
+        }
+        else
+        {
+            LEX_ERROR(parser,"expect '*/' before file end!");
+        }
+    }
+    skipBlanks(parser);
+}
+
+//获取下一个token
+void getNextToken(Parser * parser)
+{
+    parser->preToken = parser->curToken;
+    skipBlanks(parser);                 //跳过空格
+
 }
