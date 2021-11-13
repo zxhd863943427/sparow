@@ -279,6 +279,161 @@ static void skipComment(Parser* parser)
 void getNextToken(Parser * parser)
 {
     parser->preToken = parser->curToken;
-    skipBlanks(parser);                 //跳过空格
-
+    skipBlanks(parser);                                 //跳过空格
+    parser->curToken.type = TOKEN_EOF;                  //设置初始token为eof
+    parser->curToken.start = parser->nextCharPtr - 1;   //指向当前处理字符
+    while (parser->curChar != '\0')
+    {
+        switch (parser->curChar)
+        {
+            case ',':
+                parser->curToken.type = TOKEN_COMMA;
+                break;
+            case ':':
+                parser->curToken.type = TOKEN_COLON;
+                break;
+            case '(':
+                parser->curToken.type = TOKEN_LEFT_PAREN;
+                break;
+            case ')':
+                parser->curToken.type = TOKEN_RIGHT_PAREN;
+                break;
+            case '[':
+                parser->curToken.type = TOKEN_LEFT_BRACKET;
+                break;
+            case ']':
+                parser->curToken.type = TOKEN_RIGHT_BRACKET;
+                break;
+            case '{':
+                parser->curToken.type = TOKEN_LEFT_BRACE;
+                break;
+            case '}':
+                parser->curToken.type = TOKEN_RIGHT_BRACE;
+                break;
+            case '.':
+                if (matchNextChar(parser,'.'))
+                {
+                    parser->curToken.type = TOKEN_DOT_DOT;
+                }
+                else
+                {
+                    parser->curToken.type = TOKEN_DOT;
+                }
+                break;
+            case '=':
+                if (matchNextChar(parser,'='))
+                {
+                    parser->curToken.type = TOKEN_EQUAL;
+                }
+                else
+                {
+                    parser->curToken.type = TOKEN_ASSIGN;
+                }
+                break;
+            case '+':
+                parser->curToken.type = TOKEN_ADD;
+                break;
+            case '-':
+                parser->curToken.type = TOKEN_SUB;
+                break;
+            case '*':
+                parser->curToken.type = TOKEN_MUL;
+                break;
+            case '/':
+            char temp = lookAheadChar(parser);
+                if (temp == '/' || temp == '*')
+                {
+                    skipComment(parser);
+                    parser->curToken.start = parser->nextCharPtr -1;        //重置文本开始地址
+                    continue;
+                }
+                parser->curToken.type = TOKEN_DIV;
+                break;
+            case '%':
+                parser->curToken.type = TOKEN_MOD;
+                break;
+            case '&':
+                if (matchNextChar(parser,'&'))
+                {
+                    parser->curToken.type = TOKEN_LOGIC_AND;
+                }
+                else
+                {
+                    parser->curToken.type = TOKEN_BIT_AND;
+                }
+                break;
+            case '|':
+                if (matchNextChar(parser,'|'))
+                {
+                    parser->curToken.type = TOKEN_LOGIC_OR;
+                }
+                else
+                {
+                    parser->curToken.type = TOKEN_BIT_OR;
+                }
+                break;
+            case '~':
+                parser->curToken.type = TOKEN_BIT_NOT;
+                break;
+            case '?':
+                parser->curToken.type = TOKEN_QUESTION;
+                break;
+            case '>':
+                if (matchNextChar(parser,'>'))
+                {
+                    parser->curToken.type = TOKEN_BIT_SHIFT_RIGHT;
+                }
+                else if (matchNextChar(parser, '='))
+                {
+                    parser->curToken.type = TOKEN_GREATE_EQUAL;
+                }
+                else 
+                {
+                    parser->curToken.type = TOKEN_GREATE;
+                }
+                break;
+            case '<':
+                if (matchNextChar(parser,'<'))
+                {
+                    parser->curToken.type = TOKEN_BIT_SHIFT_LEFT;
+                }
+                else if (matchNextChar(parser, '='))
+                {
+                    parser->curToken.type = TOKEN_LESS_EQUAL;
+                }
+                else 
+                {
+                    parser->curToken.type = TOKEN_LESS;
+                }
+                break;
+            case '!':
+                if (matchNextChar(parser,'='))
+                {
+                    parser->curToken.type = TOKEN_NOT_EQUAL;
+                }
+                else
+                {
+                    parser->curToken.type = TOKEN_LOGIC_NOT;
+                }
+                break;
+            case '"':
+                parseString(parser);
+                break;
+            default:
+            //开始判断变量名和关键字部分
+            //暂时不做数字识别
+            if (isalpha(parser->curChar) || parser->curChar == '_')         //判断id和关键词
+            {
+                parseId(parser,TOKEN_UNKNOWN);
+                break;
+            }
+            else if (parser->curChar == '#' && matchNextChar(parser,'!'))
+            {
+                skipAline(parser);
+                continue;
+            }
+            LEX_ERROR(parser, "unsupport alpha %c !", parser->curChar);
+        }
+        parser->curToken.length = (parser->nextCharPtr -1) -parser->curToken.start;
+    }
 }
