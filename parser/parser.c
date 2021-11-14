@@ -456,3 +456,57 @@ void getNextToken(Parser * parser)
         return;
     }
 }
+//匹配当前token为expect值并读入，否则退出并返回false
+bool matchToken(Parser *parser,TokenType expected)
+{
+    if (parser->curToken.type == expected)
+    {
+        getNextToken(parser);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+//断言当前token为expected并读入下一个，否则报错errMsg
+void consumeCurToken(Parser *parser,TokenType expected,const char *errMsg)
+{
+    if (parser->curToken.type != expected)
+    {
+        COMPILE_ERROR(parser,errMsg);
+    }
+    else 
+    {
+        getNextToken(parser);
+        return;
+    }
+}
+
+//断言下一个Token为expected，否则报错errMsg
+void consumeNextToken(Parser *parser,TokenType expected, const char *errMsg)
+{
+    getNextToken(parser);
+    if (parser->curToken.type!=expected)
+    {
+        COMPILE_ERROR(parser,errMsg);
+    }
+    return;
+}
+
+//初始化parser
+void initParser(VM* vm, Parser* parser, const char* file, const char* sourceCode)
+{
+    parser->file = file;
+    parser->sourceCode = sourceCode;
+    parser->curChar = *(parser->sourceCode);
+    parser->nextCharPtr = parser->sourceCode + 1;
+    parser->curToken.lineNo = 1;
+    parser->curToken.type = TOKEN_UNKNOWN;
+    parser->curToken.length = 0;
+    parser->curToken.start = NULL;
+    parser->preToken = parser->curToken;
+    parser->vm = vm;
+    parser->interpolationExpectRightParenNum = 0;
+}

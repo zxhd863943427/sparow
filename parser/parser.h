@@ -101,7 +101,12 @@ struct parser
     Token preToken;             //前一个token
     int interpolationExpectRightParenNum;   //期望的右边括号数量
     VM* vm;
-} ;
-
-
+} parser;
+char lookAheadChar(Parser* parser);
+void getNextToken(Parser* parser); 
+void getNextToken(Parser * parser);
+bool matchToken(Parser *parser,TokenType expected);
+void consumeCurToken(Parser *parser,TokenType expected,const char *errMsg);
+void consumeNextToken(Parser *parser,TokenType expected, const char *errMsg);
+void initParser(VM* vm, Parser* parser, const char* file, const char* sourceCode);
 #endif
