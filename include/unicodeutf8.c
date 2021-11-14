@@ -44,7 +44,7 @@ uint8_t encodeUtf8(uint8_t* buf,int value)
         buf++;
         *buf=0x80 | ((value & 0xfc0)>>6);       //先与0000 1111 1100 0000取与提取，右移6位，再与10 00 0000取或补前缀
         buf++;
-        *buf=0x80 | value & 0x3f;               //先与0000 0000 0011 1111取与提取后六位，再与10 00 0000取或补前缀
+        *buf=0x80 | (value & 0x3f);               //先与0000 0000 0011 1111取与提取后六位，再与10 00 0000取或补前缀
         return 3;
     }
     else if (value < 0x10ffff)                  //位于0001 0000 1111 1111 1111 1111内
@@ -90,24 +90,24 @@ uint32_t getByteNumOfDecodeUtf8(uint8_t byte)
 //返回解码的unicode码，接受一个字节地址和最大解码长度
 int decodeUtf8(const uint8_t *buf, uint32_t length)
 {
-    int value ;
+    int value = 0;
     uint32_t remainingNum;
     //判断ascii
-    if ((*buf)&0x80==0)
+    if (((*buf)&0x80)==0)
     {
         return *buf;
     }
-    else if((*buf)&0xe0==0xc0)
+    else if(((*buf)&0xe0)==0xc0)
     {
         value+=((*buf)&0x1f);
         remainingNum = 1;
     }
-    else if ((*buf)&0xf0==0xe0)
+    else if (((*buf)&0xf0)==0xe0)
     {
         value+=((*buf)&0x0f);
         remainingNum = 2;
     }
-    else if ((*buf)&0xf8==0xf0)
+    else if (((*buf)&0xf8)==0xf0)
     {
         value+=((*buf)&0x07);
         remainingNum = 3;

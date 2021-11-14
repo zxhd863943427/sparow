@@ -1,5 +1,5 @@
 CC = gcc
-TARGET=test
+TARGET=spr
 #TARGET=spr
 DIRS = object include cli compiler parser vm gc ./
 #CFLAGS = -g -DDEBUG -lm -Wall -I object -I vm -I compiler -I parser -I include -I cli -I gc -W -Wstrict-prototypes -Wmissing-prot otypes -Wsystem-headers
