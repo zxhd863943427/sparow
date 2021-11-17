@@ -71,17 +71,17 @@ typedef struct
     union
     {
         Primitive PrimFn;       //指向原生方法
-        ObjClosure* obj;        //z=指向脚本自定义实现的方法
+        ObjClosure* obj;        //指向脚本自定义实现的方法
     };
 } Method;
 
 DECLARE_BUFFER_TYPE(Method)
 
-//类的定义
+/* 定义class*/
 struct class
 {
     ObjHeader objHeader;        //对象头
-    struct class* superClass;   //父类
+    struct classer* superClass;   //父类
     uint32_t fieldNum;          //字段数，或者说属性数，会继承父类的属性
     MethodBuffer methods;       //本类的方法
     ObjString* name;            //类名
@@ -95,6 +95,7 @@ typedef union
 }Bits64;
 //64位的可变储存单元
 
-
+#define CAPACITY_GROW_FACTOR 4  //map 和 list扩容的系数
+#define MIN_CAPACITY 64         //map 扩容相关
 
 #endif
