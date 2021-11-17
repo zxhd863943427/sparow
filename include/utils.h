@@ -6,7 +6,7 @@ void* memManager(VM* vm, void* ptr, uint32_t oldSize,uint32_t newSize);
 
 //申请一个元素的储存空间
 #define ALLOCATE(vmPtr, type) \
-    (type*)memManager(vmPtr NULL, 0, sizeof(type))
+    (type*)(memManager(vmPtr, NULL, 0, sizeof(type)))
 
 #define ALLOCATE_EXTRA(vmPtr, mainType, extraSize) \
     (mainType*)memManager(vmPtr, NULL, 0, sizeof(mainType)+ extraSize)

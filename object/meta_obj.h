@@ -15,7 +15,7 @@ typedef struct
 typedef struct
 {
     ObjHeader objHeader;            //对象头
-    Value field[0];                 //具体字段，及对象实例的属性数组
+    Value fields[0];                 //具体字段，及对象实例的属性数组
 }ObjInstance;
 //对象的实例结构，包含一个通用数值结构Value的可变数组以及对象头
 

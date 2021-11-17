@@ -81,7 +81,7 @@ DECLARE_BUFFER_TYPE(Method)
 struct class
 {
     ObjHeader objHeader;        //对象头
-    struct classer* superClass;   //父类
+    struct class* superClass;   //父类
     uint32_t fieldNum;          //字段数，或者说属性数，会继承父类的属性
     MethodBuffer methods;       //本类的方法
     ObjString* name;            //类名

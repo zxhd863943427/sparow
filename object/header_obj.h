@@ -8,7 +8,7 @@ typedef enum
     OT_CLASS,           //类
     OT_LIST,            //list类型
     OT_MAP,             //map类型
-    OT_MODULC,          //模块类型
+    OT_MODULE,          //模块类型
     OT_RANGE,           //迭代序列类型
     OT_STRING,          //string类型
     OT_UPVALUE,         //自由变量类型
