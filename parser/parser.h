@@ -2,6 +2,7 @@
 #define _INCLUDE_PARSER_H
 #include "common.h"
 #include "vm.h"
+#include "meta_obj.h"
 //定义token枚举
 typedef enum 
 {
@@ -88,6 +89,7 @@ typedef struct
     const char* start;
     uint32_t length;
     uint32_t lineNo;
+    Value value;
 }Token;
 
 struct parser
@@ -99,6 +101,7 @@ struct parser
     char curChar;
     Token curToken;             //目前token
     Token preToken;             //前一个token
+    ObjModule* curModule;
     int interpolationExpectRightParenNum;   //期望的右边括号数量
     VM* vm;
 } parser;

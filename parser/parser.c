@@ -2,9 +2,12 @@
 #include "parser.h"
 #include "utils.h"
 #include "unicodeutf8.h"
-#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "obj_string.h"
+
 
 struct keywordToken
 {
@@ -106,6 +109,43 @@ static void parseId(Parser* parser, TokenType type)
     }
     parser->curToken.length=length;
 }
+
+//解析16进制数字
+static void parseHexNum(Parser* parser)
+{
+    while (isxdigit(parser->curChar))
+    {
+        getNextChar(parser);
+    }
+}
+//解析10进制数字
+static void parseDecNum(Parser* parser)
+{
+    while (isdigit(parser->curChar))
+    {
+        getNextChar(parser);
+    }
+    //判断小数点的情况
+    if (parser->curChar=='.' && isdigit(lookAheadChar(parser)))
+    {
+        getNextChar(parser);
+        while(isdigit(parser->curChar))
+        {
+            getNextChar(parser);
+        }
+    }
+}
+//解析8进制数字
+static void parseDecNum(Parser* parser)
+{
+    while (parser->curChar >= '0' && parser->curChar < '8')
+    {
+        getNextChar(parser);
+    }
+}
+//解析数字
+static void parseNum(Parser* parser)
+{}
 //解码unicode码点，已检测到‘\uXXXX’的'u'
 static void parseUnicodeCodePoint(Parser* parser,ByteBuffer* buf)
 {
