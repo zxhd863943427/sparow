@@ -111,5 +111,5 @@ void getNextToken(Parser * parser);
 bool matchToken(Parser *parser,TokenType expected);
 void consumeCurToken(Parser *parser,TokenType expected,const char *errMsg);
 void consumeNextToken(Parser *parser,TokenType expected, const char *errMsg);
-void initParser(VM* vm, Parser* parser, const char* file, const char* sourceCode);
+void initParser(VM* vm, Parser* parser, const char* file, const char* sourceCode, ObjModule* objModule);
 #endif

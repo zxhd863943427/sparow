@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "obj_string.h"
+#include "class.h"
 
 
 struct keywordToken
@@ -136,7 +137,7 @@ static void parseDecNum(Parser* parser)
     }
 }
 //解析8进制数字
-static void parseDecNum(Parser* parser)
+static void parseOctNum(Parser* parser)
 {
     while (parser->curChar >= '0' && parser->curChar < '8')
     {
@@ -145,7 +146,34 @@ static void parseDecNum(Parser* parser)
 }
 //解析数字
 static void parseNum(Parser* parser)
-{}
+{
+    //判断前缀
+    //判断16进制
+    if (parser->curChar == '0' && matchNextChar(parser,'x'))
+    {
+        //跳过'x'
+        getNextChar(parser);
+        //调用解析函数
+        parseHexNum(parser);
+        //调用c标准库将字符串转换为16进制数字所对应的值
+        parser->curToken.value = NUM_TO_VALUE(strtol(parser->curToken.start, NULL, 16));
+    }
+    //判断8进制
+    else if (parser->curChar == '0' && isdigit(lookAheadChar(parser)))
+    {
+        parseOctNum(parser);
+        parser->curToken.value =NUM_TO_VALUE(strtol(parser->curToken.start, NULL, 8));
+    }
+    else
+    {
+        parseDecNum(parser);
+        parser->curToken.value= NUM_TO_VALUE(strtod(parser->curToken.start, NULL));
+    }
+    //计算数字字符串长度，nextCharPtr不是指向第一个不合法字符，而是指向不合法字符的下一个字符，因此需要-1
+    parser->curToken.length = ((parser->nextCharPtr - 1) - parser->curToken.start);
+    parser->curToken.type = TOKEN_NUM;
+}
+
 //解码unicode码点，已检测到‘\uXXXX’的'u'
 static void parseUnicodeCodePoint(Parser* parser,ByteBuffer* buf)
 {
@@ -261,6 +289,8 @@ static void parseString(Parser* parser)
             ByteBufferAdd(parser->vm, &str, parser->curChar);       //将非特殊文本写入缓冲区
         }
     }
+    ObjString* objString = newObjString(parser->vm, (const char*)str.datas, str.count);
+    parser->curToken.value = OBJ_TO_VALUE(objString);
     ByteBufferClear(parser->vm, &str);                              //释放缓冲区
 }
 
@@ -323,6 +353,7 @@ void getNextToken(Parser * parser)
     parser->curToken.type = TOKEN_EOF;                  //设置初始token为eof
     parser->curToken.length = 0;
     parser->curToken.start = parser->nextCharPtr - 1;   //指向当前处理字符
+    parser->curToken.value = VT_TO_VALUE(VT_UNDEFINED); //显式初始化parser->curToken.value的值，非必须
     while (parser->curChar != '\0')
     {
         switch (parser->curChar)
@@ -474,11 +505,14 @@ void getNextToken(Parser * parser)
                 break;
             default:
             //开始判断变量名和关键字部分
-            //暂时不做数字识别
                 if (isalpha(parser->curChar) || parser->curChar == '_')         //判断id和关键词
                 {
                     parseId(parser,TOKEN_UNKNOWN);
                     return;
+                }
+                else if (isdigit(parser->curChar))                              //16、8进制首字符为0,10进制首字符必定是数字，故可用isdigit()函数判断是否为数字
+                {
+                    parseNum(parser);
                 }
                 else if (parser->curChar == '#' && matchNextChar(parser,'!'))
                 {
@@ -536,7 +570,7 @@ void consumeNextToken(Parser *parser,TokenType expected, const char *errMsg)
 }
 
 //初始化parser
-void initParser(VM* vm, Parser* parser, const char* file, const char* sourceCode)
+void initParser(VM* vm, Parser* parser, const char* file, const char* sourceCode, ObjModule* objModule)
 {
     parser->file = file;
     parser->sourceCode = sourceCode;
@@ -549,4 +583,5 @@ void initParser(VM* vm, Parser* parser, const char* file, const char* sourceCode
     parser->preToken = parser->curToken;
     parser->vm = vm;
     parser->interpolationExpectRightParenNum = 0;
+    parser->curModule = objModule;
 }
