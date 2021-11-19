@@ -513,6 +513,7 @@ void getNextToken(Parser * parser)
                 else if (isdigit(parser->curChar))                              //16、8进制首字符为0,10进制首字符必定是数字，故可用isdigit()函数判断是否为数字
                 {
                     parseNum(parser);
+                    return;
                 }
                 else if (parser->curChar == '#' && matchNextChar(parser,'!'))
                 {
