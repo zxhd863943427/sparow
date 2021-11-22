@@ -106,7 +106,12 @@ typedef union
 }Bits64;
 //64位的可变储存单元
 
-#define CAPACITY_GROW_FACTOR 4  //map 和 list扩容的系数
-#define MIN_CAPACITY 64         //map 扩容相关
+#define CAPACITY_GROW_FACTOR 4  
+//map 和 list扩容的系数
+
+#define MIN_CAPACITY 64         
+//map 扩容相关
+
+bool valueIsEqual(Value a, Value b);
 
 #endif

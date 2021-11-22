@@ -49,6 +49,6 @@ bool valueIsEqual(Value a, Value b)
         //比较from和to
         return (ranA->from == ranB ->from && ranA->to == ranB->to);
     }
-    //其他相同类型也无法比较，直接返回false
+    //其他相同类型在对象头不一样的情况下也无法比较，直接返回false
     return false;
 }
