@@ -22,18 +22,25 @@ static uint32_t hashObj(ObjHeader* objHeader)
     switch (objHeader->type)
     {
         case OT_CLASS:
+        {
             Class* class = (Class*)objHeader;
             //由于目前还没有创建类的函数，所以只能先用原始方法获取class->name的hash值
             return hashString(class->name->value.start, class->name->value.length);
+        }
         case OT_RANGE:
+        {
             ObjRange* objRange = (ObjRange*)objHeader;
             return hashNum(objRange->from) ^ hashNum(objRange->to);
+        }
         case OT_STRING:
+        {
             //因为string对象里已经有hash值了，直接调用返回
             ObjString* objString = (ObjString*)objHeader;
             return objString->hashCode;
+        }
         default:
             RUN_ERROR("the hashable are objstring, objrange and class.\n 这是一个非objstring, objrange 或class的对象,它不能作为可哈希对象的键");
+            NOT_REACHED();
     }
 }
 
