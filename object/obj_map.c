@@ -217,7 +217,7 @@ Value removeKey(VM* vm, ObjMap* objMap, Value key)
         else if (objMap->capacity > MIN_CAPACITY &&
                  objMap->count > (objMap->capacity / CAPACITY_GROW_FACTOR) * MAP_LOAD_PERCENT)
         {
-            u_int32_t newCapacity = objMap->capacity / CAPACITY_GROW_FACTOR;
+            uint32_t newCapacity = objMap->capacity / CAPACITY_GROW_FACTOR;
             //判断缩小后capacity 会不会小于 MIN_CAPACITY
             if (newCapacity < MIN_CAPACITY)
             {

@@ -1,7 +1,6 @@
 #ifndef _OBJECT_MAP_H
 #define _OBJECT_MAP_H
 #include "header_obj.h"
-#include "vm.h"
 
 #define MAP_LOAD_PERCENT 0.8
 //map扩容的判断标准，利用率大于这个就扩容

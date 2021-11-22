@@ -18,6 +18,7 @@ void * memManager(VM* vm,void* ptr,uint32_t oldSize,uint32_t newSize){
     return realloc(ptr,newSize);
 }
 
+//获取最接近传入数字的2的幂次方
 uint32_t ceilToPowerOf2(uint32_t v)
 {
     //v=0时，将v修复为1,这样就能避免溢出

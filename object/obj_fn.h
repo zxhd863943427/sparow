@@ -59,7 +59,10 @@ typedef struct
 }Frame;
 //调用框架，不是对象
 
+
 #define INITIAL_FRAME_NUM 4
+//初始默认调用框架数
+
 //获得一个新的空upvalue对象
 ObjUpvalue* newObjUpvalue(VM* vm, Value* localVarPtr);
 //获得一个新的空Closure闭包对象
