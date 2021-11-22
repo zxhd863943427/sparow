@@ -184,4 +184,40 @@ void clearMap(VM* vm, ObjMap* objMap)
 
 //删除 objMap 中的 key 的同时，返回 map[key] 
 Value removeKey(VM* vm, ObjMap* objMap, Value key)
-{}
+{
+    //调用findEntry()函数查找entry
+    Entry* entry = findEntry(objMap, key);
+    if (entry == NULL)
+    {
+        return VT_TO_VALUE(VT_NULL);
+    }
+    else 
+    {
+        Value value = entry->value;
+        entry->key = VT_TO_VALUE(VT_UNDEFINED);
+        entry->value = VT_TO_VALUE(VT_TRUE);
+        
+        //将count的值减小
+        objMap->count--;
+        //判断是否要回收或减小entries的大小
+        //判断是否已经没有entry储存
+        if (objMap->count == 0)
+        {
+            clearMap(vm, objMap);
+        }
+        //先判断capacity是否小于 MIN_CAPACITY ，
+        //再判断 capacity 缩小后利用率会不会小于 80%
+        else if (objMap->capacity > MIN_CAPACITY &&
+                 objMap->count > (objMap->capacity / CAPACITY_GROW_FACTOR) * MAP_LOAD_PERCENT)
+        {
+            u_int32_t newCapacity = objMap->capacity / CAPACITY_GROW_FACTOR;
+            //判断缩小后capacity 会不会小于 MIN_CAPACITY
+            if (newCapacity < MIN_CAPACITY)
+            {
+                newCapacity = MIN_CAPACITY;
+            }
+            resizeMap(vm, objMap, newCapacity);
+        }
+        return value;
+    } 
+}
