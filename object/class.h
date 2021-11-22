@@ -5,6 +5,8 @@
 #include "header_obj.h"
 #include "obj_string.h"
 #include "obj_fn.h"
+#include "obj_list.h"
+#include "obj_range.h"
 
 typedef enum
 {
@@ -31,12 +33,21 @@ typedef enum
         value.objHeader = (ObjHeader*) (objPtr);\
         value;\
         })
+
+//将value转化为obj结构
 #define VALUE_TO_OBJ(value) (value.objHeader)
 
 #define VALUE_TO_OBJSTR(value) ((ObjString*)VALUE_TO_OBJ(value))
 #define VALUE_TO_OBJFN(value) ((ObjFn*)VALUE_TO_OBJ(value))
 #define VALUE_TO_OBJCLOSURE(value) ((ObjClosure*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJRANGE(value) ((ObjRange*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJLIST(value) ((ObjList*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJMAP(value) ((ObjMap*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJTHREAD(value) ((ObjThread*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJMODULE(value) ((ObjModule*)VALUE_TO_OBJ(value))
 #define VALUE_TO_CLASS(value) ((Class*)VALUE_TO_OBJ(value))
+
+
 
 //判断普通类型
 #define VALUE_IS_UNDEFINED(value) ((value).type == VT_UNDEFINED)
