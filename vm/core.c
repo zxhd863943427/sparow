@@ -3,8 +3,11 @@
 #include <sys/stat.h>
 #include "utils.h"
 #include "vm.h"
+#include "class.h"
 
 char *rootDir = NULL;
+#define CORE_MODULE VT_TO_VALUE(VT_NULL)
+
 char* readFile(const char* path)
 {
     FILE* file = fopen(path, "r");
@@ -28,4 +31,17 @@ char* readFile(const char* path)
     fileContent[fileSize]='\0';
     fclose(file);
     return fileContent;
+}
+
+//代码桩
+VMResult executeModule(VM* vm, Value moduleName, const char* moduleCode)
+{
+    return VM_RESULT_ERROR;
+}
+
+//编译核心模块
+void buildCore(VM* vm)
+{
+    ObjModule* objModule = newObjModule(vm, NULL);
+    mapSet(vm, vm->allModules, CORE_MODULE, OBJ_TO_VALUE(objModule));
 }
