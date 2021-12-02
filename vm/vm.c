@@ -8,8 +8,8 @@ void initVM(VM* vm)
     vm ->allocatedBytes=0;
     vm->allObjects = NULL;
     vm->curParser=NULL;
-    vm->allModules = newObjMap(vm);
     StringBufferInit(&(vm->allMethodNames));
+    vm->allModules = newObjMap(vm);
 }
 //创建虚拟机并初始化，返回一个虚拟机的指针
 VM* newVM(void)
