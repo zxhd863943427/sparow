@@ -52,3 +52,16 @@ bool valueIsEqual(Value a, Value b)
     //其他相同类型在对象头不一样的情况下也无法比较，直接返回false
     return false;
 }
+//新建一个裸类，即没有归属类的类
+Class* newRawClass(VM* vm, const char *name, uint32_t fieldNum)
+{
+    Class* class = ALLOCATE(vm, Class);
+
+    //裸类没有元类
+    initObjHeader(vm, &(class->objHeader), OT_CLASS, NULL);
+    class->name = newObjString(vm, name, strlen(name));
+    class->fieldNum = fieldNum;
+    class->superClass = NULL;                   //默认没有基类
+    MethodBufferInit(&(class->methods));
+    return class;
+}
