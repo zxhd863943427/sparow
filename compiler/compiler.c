@@ -40,5 +40,22 @@ int defineModuleVar(VM* vm, ObjModule* objModule, const char* name, uint32_t len
             MEM_ERROR("length of identifier \"%s\" should be no more than %d", id, MAX_ID_LEN);
         }
     }
-    
+    int symbolIndex = getIndexFromSymbolTable(&(objModule->moduleVarName), name, length);
+    //从模块变量名中查找变量,若不存在就添加
+    if (symbolIndex == -1)
+    {
+        //添加变量名
+        symbolIndex = addSymbol(vm, &(objModule->moduleVarName), name, length);
+        ValueBufferAdd(vm, &(objModule->moduleVarValue), value);
+    }
+    //若遇到之前预先声明的模块变量的定义,在此为其赋予正确的值
+    else if (VALUE_IS_NUM(objModule->moduleVarValue.datas[symbolIndex]))
+    {
+        objModule->moduleVarValue.datas[symbolIndex] = value;
+    }
+    else
+    {
+        symbolIndex = -1;       //已定义则返回-1,用于判断重定义
+    }
+    return symbolIndex;
 }
