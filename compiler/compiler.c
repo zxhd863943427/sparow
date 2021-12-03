@@ -9,14 +9,36 @@
 //编译单元
 struct compileUnit
 {
-    ObjFn* fn;                                  //
-    LocalVar localVars[MAX_LOCAL_VAR_NUM];
-    uint32_t localVarNum;
-    Upvalue upvalues[MAX_UPVALUE_NUM];
-    int scopeDepth;                             //
-    uint32_t stackSlotNum;
-    Loop* curLoop;                              //
-    ClassBookKeep* enclosingClassBK;
-    struct compileUnit* enclosingUnit;
-    Parser* curParser;
+    ObjFn* fn;                                  //所编译的函数对象
+    LocalVar localVars[MAX_LOCAL_VAR_NUM];      //作用域中允许的局部变量的数量上限
+    uint32_t localVarNum;                       //已分配局部变量数
+    Upvalue upvalues[MAX_UPVALUE_NUM];          //记录所引用的upvalue
+    int scopeDepth;                             //记录当前编译代码的作用域
+    uint32_t stackSlotNum;                      //当前使用的slot数
+    Loop* curLoop;                              //当前正在编译的循环层
+    ClassBookKeep* enclosingClassBK;            //当前正编译的类的编译信息
+    struct compileUnit* enclosingUnit;          //指向包含此编译单元的编译单元，即直接外层
+    Parser* curParser;                          //当前parser
 };
+
+//在模块 objModule 中定义名为 name,值为 value 的模块变量
+int defineModuleVar(VM* vm, ObjModule* objModule, const char* name, uint32_t length, Value value)
+{
+    //判断命名是否长度大于最大限制长度，如果是，则复制长度限制范围内的文本
+    //并根据对应情况输出报错信息
+    if (length > MAX_ID_LEN)
+    {
+        char id[MAX_ID_LEN] = {'\0'};
+        memcpy(id, name, length);
+        //判断当前是否已生成词法分析器
+        if (vm->curParser != NULL)
+        {
+            COMPILE_ERROR(vm->curParser,"length of identifier \'%s\' should be no more than %d ",id, MAX_ID_LEN);
+        }
+        else
+        {
+            MEM_ERROR("length of identifier \"%s\" should be no more than %d", id, MAX_ID_LEN);
+        }
+    }
+    
+}
