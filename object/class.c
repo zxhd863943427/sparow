@@ -65,3 +65,24 @@ Class* newRawClass(VM* vm, const char *name, uint32_t fieldNum)
     MethodBufferInit(&(class->methods));
     return class;
 }
+
+//获取值的类
+//数字等 Value 也被视为对象,因此参数为 Value.获得对象 obj 所属的类
+inline Class* getClassOfObj(VM* vm, Value object)
+{
+    switch(object.type)
+    {
+        case VT_NULL:
+            return vm->nullClass;
+        case VT_FALSE:
+        case VT_TRUE:
+            return vm->boolClass;
+        case VT_NUM:
+            return vm->numClass;
+        case VT_OBJ:
+            return VALUE_TO_OBJ(object)->class;
+        default:
+            NOT_REACHED();
+    }
+    return NULL;
+}
