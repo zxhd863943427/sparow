@@ -57,7 +57,7 @@ typedef struct
         buf->datas= NULL;\
         buf->count = buf->capacity=0;\
     }\
-    /* 将缓冲区剩余部分全填同个元素 */\
+    /* 将缓冲区指定长度部分全填同个元素 */\
     void type##BufferFillWrite(VM* vm,type##Buffer* buf, type data, uint32_t fillCount)\
     {\
         uint32_t newCounts = buf->count+fillCount;\
@@ -66,7 +66,7 @@ typedef struct
         {\
             size_t oldSize =buf->capacity * sizeof(type);\
             buf->capacity = ceilToPowerOf2(newCounts);\
-            size_t newSize = buf->capacity *sizeof(newCounts);\
+            size_t newSize = buf->capacity *sizeof(type);\
             ASSERT(newSize > oldSize,"faint...memory allocate!");\
             buf->datas = (type *)memManager(vm, buf->datas,oldSize,newSize);\
         }\
