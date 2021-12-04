@@ -16,7 +16,7 @@ typedef enum vmResult
 struct vm
 {
     Class* classOfClass;        //元类
-    Class* objClass;            //类
+    Class* objectClass;            //类
     Class* stringClass;         //string对象的父类
     Class* mapClass;            //map对象的父类
     Class* rangeClass;          //range对象的父类
