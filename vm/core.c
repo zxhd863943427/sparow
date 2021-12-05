@@ -1,10 +1,5 @@
 #include "core.h"
-#include <string.h>
-#include <sys/stat.h>
-#include "utils.h"
-#include "vm.h"
-#include "class.h"
-#include "compiler.h"
+
 
 char *rootDir = NULL;                       //根目录
 
@@ -176,7 +171,7 @@ static bool primObjectmetaSame(VM* vm UNUSED, Value* args)
 static ObjModule* getModule(VM* vm, Value moduleName)
 {
     Value value = mapGet(vm->allModules, moduleName);
-    if (value.type = VT_UNDEFINED)
+    if (value.type == VT_UNDEFINED)
     {
         return NULL;
     }
@@ -188,7 +183,7 @@ static ObjModule* getModule(VM* vm, Value moduleName)
 static ObjThread* loadModule(VM* vm, Value moduleName, const char* moduleCode)
 {
     //先查看是否已经导入了该模块,避免重新导入
-    ObjString* module = getModule(vm, moduleName);
+    ObjModule* module = getModule(vm, moduleName);
     //若该模块名=NULL,则说明未加载,先将其载入,并继承核心模块中的变量
     if (module == NULL)
     {
@@ -303,32 +298,32 @@ void buildCore(VM* vm)
     mapSet(vm, vm->allModules, CORE_MODULE, OBJ_TO_VALUE(coreModule));
 
     //创建 object 类并绑定方法
-    vm->objectClass = defineClass(vm, coreModule, 'object');
-    PRIM_METHOD_BIND(vm->objectClass, '!', primObjectNot);
-    PRIM_METHOD_BIND(vm->objectClass, '==(_)', primObjectEqual);
-    PRIM_METHOD_BIND(vm->objectClass, '!=(_)', primObjectNotEqual);
-    PRIM_METHOD_BIND(vm->objectClass, 'is(_)', primObjectIs);
-    PRIM_METHOD_BIND(vm->objectClass, 'toString', primObjectToString);
-    PRIM_METHOD_BIND(vm->objectClass, 'type',primObjectType);
+    vm->objectClass = defineClass(vm, coreModule, "object");
+    PRIM_METHOD_BIND(vm->objectClass, "!", primObjectNot);
+    PRIM_METHOD_BIND(vm->objectClass, "==(_)", primObjectEqual);
+    PRIM_METHOD_BIND(vm->objectClass, "!=(_)", primObjectNotEqual);
+    PRIM_METHOD_BIND(vm->objectClass, "is(_)", primObjectIs);
+    PRIM_METHOD_BIND(vm->objectClass, "toString", primObjectToString);
+    PRIM_METHOD_BIND(vm->objectClass, "type",primObjectType);
 
     //定义 classOfClass 类,它是所有 meta 类的 meta 类和基类
-    vm->classOfClass = defineClass(vm, coreModule, 'class');
+    vm->classOfClass = defineClass(vm, coreModule, "class");
 
     //objectClass 是任何类的基类
     bindSuperClass(vm, vm->objectClass, vm->classOfClass);
 
-    PRIM_METHOD_BIND(vm->classOfClass, 'name', primClassName);
-    PRIM_METHOD_BIND(vm->classOfClass, 'toString',primClassToString);
-    PRIM_METHOD_BIND(vm->classOfClass, 'supertype', primClassSupertype);
+    PRIM_METHOD_BIND(vm->classOfClass, "name", primClassName);
+    PRIM_METHOD_BIND(vm->classOfClass, "toString",primClassToString);
+    PRIM_METHOD_BIND(vm->classOfClass, "supertype", primClassSupertype);
     
     //定义 object 类的元信息类 objectMetaclass,它无须挂载到 vm
-    Class* objectMeta = defineClass(vm, coreModule, 'objectMeta');
+    Class* objectMeta = defineClass(vm, coreModule, "objectMeta");
 
     //classOfClass 类是所有 meta 类的 meta 类和基类
     bindSuperClass(vm, objectMeta, vm->classOfClass);
 
     //类型比较
-    PRIM_METHOD_BIND(objectMeta, 'same(_,_)',primObjectmetaSame);
+    PRIM_METHOD_BIND(objectMeta, "same(_,_)",primObjectmetaSame);
 
     //绑定各自的 meta 类
     vm->classOfClass->objHeader.class = vm->classOfClass;

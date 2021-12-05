@@ -1,6 +1,12 @@
 #ifndef _INCLUDE_CORE_H
 #define _INCLUDE_CORE_H
 #include"vm.h"
+#include <string.h>
+#include <sys/stat.h>
+#include "utils.h"
+#include "vm.h"
+#include "class.h"
+#include "compiler.h"
 extern char *rootDir;
 char* readFile(const char* sourceFile);
 int getIndexFromSymbolTable(SymbolTable* table, const char *symbol, uint32_t length);
