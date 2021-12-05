@@ -172,6 +172,52 @@ static bool primObjectmetaSame(VM* vm UNUSED, Value* args)
     RET_VALUE(boolValue);
 }
 
+//从 modules 中获取名为 moduleName 的模块
+static ObjModule* getModule(VM* vm, Value moduleName)
+{
+    Value value = mapGet(vm->allModules, moduleName);
+    if (value.type = VT_UNDEFINED)
+    {
+        return NULL;
+    }
+    return VALUE_TO_OBJMODULE(value);
+}
+
+
+//载入模块 moduleName 并编译
+static ObjThread* loadModule(VM* vm, Value moduleName, const char* moduleCode)
+{
+    //先查看是否已经导入了该模块,避免重新导入
+    ObjString* module = getModule(vm, moduleName);
+    //若该模块名=NULL,则说明未加载,先将其载入,并继承核心模块中的变量
+    if (module == NULL)
+    {
+        //创建模块并添加到 vm->allModules
+        ObjString* modName = VALUE_TO_OBJSTR(moduleName);
+        ASSERT(modName->value.start[modName->value.length]=='\0', "string.value.start is not terminated!");
+
+        module = newObjModule(vm, modName->value.start);
+        mapSet(vm, vm->allModules, moduleName, OBJ_TO_VALUE(module));
+
+        //继承核心模块中的变量
+        ObjModule* coreModule = getModule(vm, CORE_MODULE);
+        uint32_t idx = 0;
+        while (idx < coreModule->moduleVarName.count)
+        {
+            defineModuleVar(vm, module, 
+                coreModule->moduleVarName.datas[idx].str, 
+                coreModule->moduleVarName.datas[idx].length, 
+                coreModule->moduleVarValue.datas[idx]);
+            idx++;
+        }
+    }
+    ObjFn* fn = compileModule(vm, module, moduleCode);
+    ObjClosure* objClosure = newObjClosure(vm, fn);
+    ObjThread* moduleThread = newObjThread(vm, objClosure);
+
+    return moduleThread;
+}
+
 //table 中查找符号 symbol，找到后返回索引，否则返回-1 
 int getIndexFromSymbolTable(SymbolTable* table, const char *symbol, uint32_t length)
 {
@@ -245,6 +291,7 @@ void bindSuperClass(VM* vm, Class* subClass, Class* superClass)
 //代码桩superClass->fieldNum
 VMResult executeModule(VM* vm, Value moduleName, const char* moduleCode)
 {
+    ObjThread* objThread = loadModule(vm, moduleName, moduleCode);
     return VM_RESULT_ERROR;
 }
 

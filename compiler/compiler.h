@@ -79,5 +79,6 @@ typedef struct
 typedef struct compileUnit CompileUnit;
 
 int defineModuleVar(VM* vm, ObjModule* objModule, const char* name, uint32_t length, Value value);
+ObjFn* compileModule(VM* vm, ObjModule* objModule, const char* moduleCode);
 
 #endif
